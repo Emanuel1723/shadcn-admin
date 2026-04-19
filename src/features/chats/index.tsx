@@ -14,7 +14,7 @@ import {
   Video,
   MessagesSquare,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, getDisplayNameInitials } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -67,12 +67,10 @@ export function Chats() {
     <>
       {/* ===== Top Heading ===== */}
       <Header>
-        <Search />
-        <div className='ms-auto flex items-center space-x-4'>
-          <ThemeSwitch />
-          <ConfigDrawer />
-          <ProfileDropdown />
-        </div>
+        <Search className='me-auto' />
+        <ThemeSwitch />
+        <ConfigDrawer />
+        <ProfileDropdown />
       </Header>
 
       <Main fixed>
@@ -139,7 +137,9 @@ export function Chats() {
                       <div className='flex gap-2'>
                         <Avatar>
                           <AvatarImage src={profile} alt={username} />
-                          <AvatarFallback>{username}</AvatarFallback>
+                          <AvatarFallback>
+                            {getDisplayNameInitials(fullName)}
+                          </AvatarFallback>
                         </Avatar>
                         <div>
                           <span className='col-start-2 row-span-2 font-medium'>
@@ -163,7 +163,7 @@ export function Chats() {
             <div
               className={cn(
                 'absolute inset-0 start-full z-50 hidden w-full flex-1 flex-col border bg-background shadow-xs sm:static sm:z-auto sm:flex sm:rounded-md',
-                mobileSelectedUser && 'start-0 flex'
+                mobileSelectedUser && 'inset-s-0 flex'
               )}
             >
               {/* Top Part */}
@@ -184,7 +184,9 @@ export function Chats() {
                         src={selectedUser.profile}
                         alt={selectedUser.username}
                       />
-                      <AvatarFallback>{selectedUser.username}</AvatarFallback>
+                      <AvatarFallback>
+                        {getDisplayNameInitials(selectedUser.fullName)}
+                      </AvatarFallback>
                     </Avatar>
                     <div>
                       <span className='col-start-2 row-span-2 text-sm font-medium lg:text-base'>
