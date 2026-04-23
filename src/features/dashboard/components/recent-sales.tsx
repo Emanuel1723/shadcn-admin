@@ -3,80 +3,42 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 export function RecentSales() {
   return (
     <div className='space-y-8'>
+      {/* Ejemplo de un colaborador real o genérico del AILA */}
       <div className='flex items-center gap-4'>
         <Avatar className='h-9 w-9'>
           <AvatarImage src='/avatars/01.png' alt='Avatar' />
-          <AvatarFallback>OM</AvatarFallback>
+          <AvatarFallback>EG</AvatarFallback>
         </Avatar>
         <div className='flex flex-1 flex-wrap items-center justify-between'>
           <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>Olivia Martin</p>
+            <p className='text-sm leading-none font-medium'>Emanuel González</p>
             <p className='text-sm text-muted-foreground'>
-              olivia.martin@email.com
+              Soporte Técnico - AILA
             </p>
           </div>
-          <div className='font-medium'>+$1,999.00</div>
+          <div className='text-xs font-medium text-muted-foreground'>Laptop Dell</div>
         </div>
       </div>
+
       <div className='flex items-center gap-4'>
         <Avatar className='flex h-9 w-9 items-center justify-center space-y-0 border'>
           <AvatarImage src='/avatars/02.png' alt='Avatar' />
-          <AvatarFallback>JL</AvatarFallback>
+          <AvatarFallback>OV</AvatarFallback>
         </Avatar>
         <div className='flex flex-1 flex-wrap items-center justify-between'>
           <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>Jackson Lee</p>
+            <p className='text-sm leading-none font-medium'>Ovimer</p>
             <p className='text-sm text-muted-foreground'>
-              jackson.lee@email.com
+              Supervisor IT
             </p>
           </div>
-          <div className='font-medium'>+$39.00</div>
-        </div>
-      </div>
-      <div className='flex items-center gap-4'>
-        <Avatar className='h-9 w-9'>
-          <AvatarImage src='/avatars/03.png' alt='Avatar' />
-          <AvatarFallback>IN</AvatarFallback>
-        </Avatar>
-        <div className='flex flex-1 flex-wrap items-center justify-between'>
-          <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>Isabella Nguyen</p>
-            <p className='text-sm text-muted-foreground'>
-              isabella.nguyen@email.com
-            </p>
-          </div>
-          <div className='font-medium'>+$299.00</div>
+          <div className='text-xs font-medium text-muted-foreground'>Laptop HP</div>
         </div>
       </div>
 
-      <div className='flex items-center gap-4'>
-        <Avatar className='h-9 w-9'>
-          <AvatarImage src='/avatars/04.png' alt='Avatar' />
-          <AvatarFallback>WK</AvatarFallback>
-        </Avatar>
-        <div className='flex flex-1 flex-wrap items-center justify-between'>
-          <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>William Kim</p>
-            <p className='text-sm text-muted-foreground'>will@email.com</p>
-          </div>
-          <div className='font-medium'>+$99.00</div>
-        </div>
-      </div>
-
-      <div className='flex items-center gap-4'>
-        <Avatar className='h-9 w-9'>
-          <AvatarImage src='/avatars/05.png' alt='Avatar' />
-          <AvatarFallback>SD</AvatarFallback>
-        </Avatar>
-        <div className='flex flex-1 flex-wrap items-center justify-between'>
-          <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>Sofia Davis</p>
-            <p className='text-sm text-muted-foreground'>
-              sofia.davis@email.com
-            </p>
-          </div>
-          <div className='font-medium'>+$39.00</div>
-        </div>
+      {/* Puedes seguir agregando a tus otros 4 colaboradores aquí */}
+      <div className='flex items-center gap-4 text-muted-foreground italic text-xs justify-center pt-4'>
+        Mostrando últimas asignaciones de personal.
       </div>
     </div>
   )

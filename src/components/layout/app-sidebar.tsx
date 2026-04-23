@@ -3,7 +3,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
 } from '@/components/ui/sidebar'
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
@@ -12,7 +11,11 @@ import { TeamSwitcher } from './team-switcher'
 
 export function AppSidebar() {
   return (
-    <Sidebar collapsible='icon' variant='sidebar'>
+    <Sidebar 
+    collapsible="icon" 
+    variant="inset" 
+    className="flex flex-col w-[16rem] min-w-0"
+    >
       <SidebarHeader>
         <TeamSwitcher teams={sidebarData.teams} />
       </SidebarHeader>
@@ -26,8 +29,6 @@ export function AppSidebar() {
       <SidebarFooter>
         <NavUser user={sidebarData.user} />
       </SidebarFooter>
-      
-      <SidebarRail />
     </Sidebar>
   )
 }

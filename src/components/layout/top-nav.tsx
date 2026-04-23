@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -13,14 +13,17 @@ type TopNavProps = React.HTMLAttributes<HTMLElement> & {
   links: {
     title: string
     href: string
-    isActive: boolean
     disabled?: boolean
   }[]
 }
 
 export function TopNav({ className, links, ...props }: TopNavProps) {
+  const routerState = useRouterState()
+  const currentPath = routerState.location.pathname
+
   return (
     <>
+      {/* Menú desplegable en pantallas pequeñas */}
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -33,20 +36,24 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side='bottom' align='start'>
-          {links.map(({ title, href, isActive, disabled }) => (
-            <DropdownMenuItem key={`${title}-${href}`} asChild>
-              <Link
-                to={href}
-                className={!isActive ? 'text-muted-foreground' : ''}
-                disabled={disabled}
-              >
-                {title}
-              </Link>
-            </DropdownMenuItem>
-          ))}
+          {links.map(({ title, href, disabled }) => {
+            const isActive = currentPath === href
+            return (
+              <DropdownMenuItem key={`${title}-${href}`} asChild>
+                <Link
+                  to={href}
+                  className={!isActive ? 'text-muted-foreground' : 'font-bold text-primary'}
+                  disabled={disabled}
+                >
+                  {title}
+                </Link>
+              </DropdownMenuItem>
+            )
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Menú horizontal en pantallas grandes */}
       <nav
         className={cn(
           'hidden items-center space-x-4 lg:flex lg:space-x-4 xl:space-x-6',
@@ -54,16 +61,21 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
         )}
         {...props}
       >
-        {links.map(({ title, href, isActive, disabled }) => (
-          <Link
-            key={`${title}-${href}`}
-            to={href}
-            disabled={disabled}
-            className={`text-sm font-medium transition-colors hover:text-primary ${isActive ? '' : 'text-muted-foreground'}`}
-          >
-            {title}
-          </Link>
-        ))}
+        {links.map(({ title, href, disabled }) => {
+          const isActive = currentPath === href
+          return (
+            <Link
+              key={`${title}-${href}`}
+              to={href}
+              disabled={disabled}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive ? 'text-primary font-bold' : 'text-muted-foreground'
+              }`}
+            >
+              {title}
+            </Link>
+          )
+        })}
       </nav>
     </>
   )

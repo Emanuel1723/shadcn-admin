@@ -1,24 +1,21 @@
 import { cn } from '@/lib/utils'
 
-type MainProps = React.HTMLAttributes<HTMLElement> & {
+interface MainProps extends React.HTMLAttributes<HTMLElement> {
   fixed?: boolean
-  fluid?: boolean
-  ref?: React.Ref<HTMLElement>
 }
 
-export function Main({ fixed, className, fluid, ...props }: MainProps) {
+export function Main({ fixed, className, ...props }: MainProps) {
   return (
     <main
-      data-layout={fixed ? 'fixed' : 'auto'}
       className={cn(
-        'px-4 py-6',
-
-        // If layout is fixed, make the main container flex and grow
-        fixed && 'flex grow flex-col overflow-hidden',
-
-        // If layout is not fluid, set the max-width
-        !fluid &&
-          '@7xl/content:mx-auto @7xl/content:w-full @7xl/content:max-w-7xl',
+        // flex-1: Ocupa todo el espacio disponible
+        // min-w-0: CLAVE para que el flex-item no desborde al padre con tablas anchas
+        // w-full: Asegura que rellene el ancho del SidebarInset
+        'relative flex flex-1 flex-col w-full min-w-0 focus:outline-none',
+        
+        // Si es 'fixed', ocupará el alto de la pantalla sin scroll general
+        fixed && 'h-svh overflow-hidden',
+        
         className
       )}
       {...props}

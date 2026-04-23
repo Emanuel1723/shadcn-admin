@@ -13,26 +13,29 @@ type AuthenticatedLayoutProps = {
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const defaultOpen = getCookie('sidebar_state') !== 'false'
+
   return (
     <SearchProvider>
       <LayoutProvider>
+        {/* IMPORTANTE: SidebarProvider ya es un contenedor flex. 
+           No le agregues 'w-full' manualmente si usas la variante 'inset'.
+        */}
         <SidebarProvider defaultOpen={defaultOpen}>
           <SkipToMain />
+          
           <AppSidebar />
+          
           <SidebarInset
             className={cn(
-              // Set content container, so we can use container queries
-              '@container/content',
-
-              // If layout is fixed, set the height
-              // to 100svh to prevent overflow
-              'has-data-[layout=fixed]:h-svh',
-
-              // If layout is fixed and sidebar is inset,
-              // set the height to 100svh - spacing (total margins) to prevent overflow
-              'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]'
+              // flex-1 permite que el contenido ocupe todo el espacio restante.
+              // min-w-0 es VITAL para que las tablas con scroll no rompan el layout.
+              'relative flex min-h-svh flex-1 flex-col bg-background min-w-0',
+              '@container/content'
             )}
           >
+            {/* Renderiza la página. Asegúrate de que en 'ColaboradoresPage' 
+                NO estés llamando a AuthenticatedLayout otra vez.
+            */}
             {children ?? <Outlet />}
           </SidebarInset>
         </SidebarProvider>

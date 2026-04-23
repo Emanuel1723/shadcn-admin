@@ -1,6 +1,6 @@
 import {
   LayoutDashboard,
-  Package,
+  Laptop, 
   Users,
   Wrench,
   Settings,
@@ -33,7 +33,7 @@ export const sidebarData: SidebarData = {
         {
           title: 'Equipos',
           url: '/equipos',
-          icon: Package,
+          icon: Laptop,
         },
         {
           title: 'Colaboradores',

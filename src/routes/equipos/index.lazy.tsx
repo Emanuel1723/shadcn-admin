@@ -38,6 +38,9 @@ import {
 import { Plus, Monitor, Pencil, Trash2, FileUp, FileDown, Search, User, Hash, Tag } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { TopNav } from '@/components/layout/top-nav'
+import { topNav } from '@/components/layout/nav-links';
+
 // IMPORTACIONES DE LAYOUT Y UI
 import { AuthenticatedLayout } from '@/components/layout/authenticated-layout'
 import { Main } from '@/components/layout/main'
@@ -52,6 +55,10 @@ function EquiposPage() {
   const [open, setOpen] = useState(false)
   const [showNewMarca, setShowNewMarca] = useState(false)
   const [showNewTipo, setShowNewTipo] = useState(false)
+  
+  // Estados para el modal de eliminación
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null)
   
   // Referencia para el input de archivo
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -96,7 +103,6 @@ function EquiposPage() {
     )
   }, [equipos, searchTerm])
 
-  // --- LÓGICA DE EXCEL CORREGIDA ---
   const importarExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -128,9 +134,8 @@ function EquiposPage() {
         }))
 
         setDatosTemporales(mapeados)
-        setShowImportAlert(true) // Esto abre el modal de confirmación
+        setShowImportAlert(true)
         
-        // Limpiar el input para permitir subir el mismo archivo otra vez si se desea
         if (fileInputRef.current) fileInputRef.current.value = ""
         
       } catch (error) { 
@@ -142,16 +147,34 @@ function EquiposPage() {
   }
 
   const confirmarImportacion = (sobreescribir: boolean) => {
-    if (!datosTemporales) return
-    if (sobreescribir) {
-      setEquipos(datosTemporales)
+  if (!datosTemporales) return
+
+  if (sobreescribir) {
+    setEquipos(datosTemporales)
+    toast.success("Inventario reemplazado por completo")
+  } else {
+    // Filtrar los que ya existen por SN (ignorando mayúsculas/minúsculas)
+    const nuevosEquipos = datosTemporales.filter(temp => 
+      !equipos.some(existente => existente.sn?.toLowerCase() === temp.sn?.toLowerCase())
+    )
+
+    const duplicadosCount = datosTemporales.length - nuevosEquipos.length
+
+    if (nuevosEquipos.length === 0) {
+      toast.error("Todos los equipos del Excel ya existen en el sistema.")
     } else {
-      setEquipos(prev => [...prev, ...datosTemporales])
+      setEquipos(prev => [...prev, ...nuevosEquipos])
+      if (duplicadosCount > 0) {
+        toast.warning(`Se añadieron ${nuevosEquipos.length} equipos, pero se omitieron ${duplicadosCount} que ya estaban duplicados.`)
+      } else {
+        toast.success(`Se importaron ${nuevosEquipos.length} equipos nuevos con éxito.`)
+      }
     }
-    setShowImportAlert(false)
-    setDatosTemporales(null)
-    toast.success("Datos importados con éxito")
   }
+  
+  setShowImportAlert(false)
+  setDatosTemporales(null)
+}
 
   const exportarExcel = () => {
     if (equipos.length === 0) {
@@ -184,27 +207,57 @@ function EquiposPage() {
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const marcaFinal = showNewMarca ? formData.get('nueva-marca') as string : formData.get('marca') as string
-    const tipoFinal = showNewTipo ? formData.get('nuevo-tipo') as string : formData.get('tipo') as string
+  e.preventDefault()
+  const formData = new FormData(e.currentTarget)
+  
+  const snNuevo = formData.get('sn') as string
+  const activoNuevo = formData.get('activo') as string
+  const marcaFinal = showNewMarca ? formData.get('nueva-marca') as string : formData.get('marca') as string
+  const tipoFinal = showNewTipo ? formData.get('nuevo-tipo') as string : formData.get('tipo') as string
 
-    const nuevo = {
-      id: editingEquipo ? editingEquipo.id : crypto.randomUUID(),
-      colaborador: formData.get('colaborador'),
-      posicion: formData.get('posicion'),
-      depto: formData.get('depto'),
-      tipo: tipoFinal,
-      marca: marcaFinal,
-      modelo: formData.get('modelo'),
-      sn: formData.get('sn'),
-      activo: formData.get('activo'),
-    }
+  // --- VALIDACIONES ---
 
-    setEquipos(prev => editingEquipo ? prev.map(x => x.id === nuevo.id ? nuevo : x) : [...prev, nuevo])
-    cerrarModal()
-    toast.success('Guardado correctamente')
+  // 1. Verificar si el SN ya existe en otro equipo (excluyendo el que estamos editando)
+  const snDuplicado = equipos.find(eq => 
+    eq.sn?.toLowerCase() === snNuevo.toLowerCase() && eq.id !== editingEquipo?.id
+  )
+  if (snDuplicado) {
+    return toast.error(`Error: El Serial Number "${snNuevo}" ya está registrado a nombre de ${snDuplicado.colaborador}.`)
   }
+
+  // 2. Verificar si el Activo Fijo ya existe
+  if (activoNuevo) {
+    const activoDuplicado = equipos.find(eq => 
+      eq.activo?.toLowerCase() === activoNuevo.toLowerCase() && eq.id !== editingEquipo?.id
+    )
+    if (activoDuplicado) {
+      return toast.error(`Error: El código de Activo "${activoNuevo}" ya existe.`)
+    }
+  }
+
+  // 3. Validación de campos obligatorios básicos (HTML5 ya hace parte, pero esto es extra seguridad)
+  if (!tipoFinal || !marcaFinal) {
+    return toast.error("Por favor, selecciona el tipo y la marca del equipo.")
+  }
+
+  // --- FIN DE VALIDACIONES ---
+
+  const nuevo = {
+    id: editingEquipo ? editingEquipo.id : crypto.randomUUID(),
+    colaborador: formData.get('colaborador'),
+    posicion: formData.get('posicion'),
+    depto: formData.get('depto'),
+    tipo: tipoFinal,
+    marca: marcaFinal,
+    modelo: formData.get('modelo'),
+    sn: snNuevo,
+    activo: activoNuevo,
+  }
+
+  setEquipos(prev => editingEquipo ? prev.map(x => x.id === nuevo.id ? nuevo : x) : [...prev, nuevo])
+  cerrarModal()
+  toast.success(editingEquipo ? 'Equipo actualizado' : 'Nuevo equipo registrado')
+}
 
   const cerrarModal = () => {
     setOpen(false)
@@ -221,10 +274,13 @@ function EquiposPage() {
           <div className='flex items-center gap-2'>
             <SidebarTrigger className='-ml-1' />
             <Separator orientation='vertical' className='mr-2 h-4' />
-            <div className='flex flex-col text-foreground'>
-              <h1 className='text-md font-bold tracking-tight leading-none'>Inventario IT - AILA</h1>
-              <span className='text-[10px] text-blue-500 font-bold uppercase tracking-widest mt-1'>Control de Activos</span>
-            </div>
+          <div className='flex flex-col text-foreground'>
+            <h1 className='text-md font-bold tracking-tight leading-none'>Inventario IT - AILA</h1>
+            <span className='text-[10px] text-blue-500 font-bold uppercase tracking-widest mt-1'>Control de Activos</span>
+          </div>
+            <Separator orientation='vertical' className='mr-2 h-4' />
+          <TopNav links={topNav} className="me-auto" />
+            
           </div>
           
           <div className="flex items-center gap-3">
@@ -241,7 +297,6 @@ function EquiposPage() {
             
             <ThemeSwitch />
 
-            {/* INPUT INVISIBLE PERO VINCULADO AL BOTÓN */}
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -268,9 +323,8 @@ function EquiposPage() {
             </Button>
           </div>
         </header>
-
-        {/* --- TABLA DE EQUIPOS --- */}
-        <div className='flex-1 overflow-auto rounded-xl border border-border bg-card shadow-sm'>
+        
+        <div className='flex-1 overflow-auto rounded-xl border border-border bg-card shadow-sm mt-10 mx-10'>
           <Table>
             <TableHeader className="bg-muted/50 sticky top-0 z-10">
               <TableRow className="border-border">
@@ -313,7 +367,15 @@ function EquiposPage() {
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-500" onClick={() => { setEditingEquipo(e); setOpen(true); }}>
                           <Pencil size={14}/>
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-500" onClick={() => setEquipos(prev => prev.filter(x => x.id !== e.id))}>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-muted-foreground hover:text-red-500" 
+                          onClick={() => {
+                            setSelectedEquipoId(e.id);
+                            setIsConfirmOpen(true);
+                          }}
+                        >
                           <Trash2 size={14}/>
                         </Button>
                       </div>
@@ -445,7 +507,35 @@ function EquiposPage() {
           </AlertDialogContent>
         </AlertDialog>
 
-      </Main>
-    </AuthenticatedLayout>
+        {/* --- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN --- */}
+<AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+  <AlertDialogContent className="bg-card border-border text-foreground">
+    <AlertDialogHeader>
+      <AlertDialogTitle>¿Estás completamente seguro?</AlertDialogTitle>
+      <AlertDialogDescription className="text-muted-foreground">
+        Esta acción eliminará el equipo permanentemente del inventario del AILA y no se puede deshacer.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <Button variant="ghost" onClick={() => setIsConfirmOpen(false)}>
+        Cancelar
+      </Button>
+      <AlertDialogAction 
+        className="bg-red-600 hover:bg-red-700 text-white border-none"
+        onClick={() => {
+          setEquipos(prev => prev.filter(x => x.id !== selectedEquipoId));
+          setIsConfirmOpen(false);
+          toast.success("Equipo eliminado del sistema");
+        }}
+      >
+        Eliminar Equipo
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
+</Main>
+</AuthenticatedLayout>
   )
 }
+

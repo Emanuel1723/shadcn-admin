@@ -38,7 +38,9 @@ export function NavGroup({ title, items }: NavGroupProps) {
   const href = useLocation({ select: (location) => location.href })
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{title}</SidebarGroupLabel>
+      <SidebarGroupLabel className='group-data-[collapsible=icon]:hidden'>
+        {title}
+      </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const key = `${item.title}-${item.url}`
@@ -73,8 +75,14 @@ function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
       >
         <Link to={item.url} onClick={() => setOpenMobile(false)}>
           {item.icon && <item.icon />}
-          <span>{item.title}</span>
-          {item.badge && <NavBadge>{item.badge}</NavBadge>}
+          <span className='truncate group-data-[collapsible=icon]:hidden'>
+            {item.title}
+          </span>
+          {item.badge && (
+            <div className='ms-auto group-data-[collapsible=icon]:hidden'>
+              <NavBadge>{item.badge}</NavBadge>
+            </div>
+          )}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
@@ -99,9 +107,15 @@ function SidebarMenuCollapsible({
         <CollapsibleTrigger asChild>
           <SidebarMenuButton tooltip={item.title}>
             {item.icon && <item.icon />}
-            <span>{item.title}</span>
-            {item.badge && <NavBadge>{item.badge}</NavBadge>}
-            <ChevronRight className='ms-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 rtl:rotate-180' />
+            <span className='truncate group-data-[collapsible=icon]:hidden'>
+              {item.title}
+            </span>
+            {item.badge && (
+              <div className='ms-auto group-data-[collapsible=icon]:hidden'>
+                <NavBadge>{item.badge}</NavBadge>
+              </div>
+            )}
+            <ChevronRight className='ms-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden' />
           </SidebarMenuButton>
         </CollapsibleTrigger>
         <CollapsibleContent className='CollapsibleContent'>
@@ -143,9 +157,7 @@ function SidebarMenuCollapsedDropdown({
             isActive={checkIsActive(href, item)}
           >
             {item.icon && <item.icon />}
-            <span>{item.title}</span>
-            {item.badge && <NavBadge>{item.badge}</NavBadge>}
-            <ChevronRight className='ms-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+            <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent side='right' align='start' sideOffset={4}>
@@ -175,9 +187,9 @@ function SidebarMenuCollapsedDropdown({
 
 function checkIsActive(href: string, item: NavItem, mainNav = false) {
   return (
-    href === item.url || // /endpint?search=param
-    href.split('?')[0] === item.url || // endpoint
-    !!item?.items?.filter((i) => i.url === href).length || // if child nav is active
+    href === item.url ||
+    href.split('?')[0] === item.url ||
+    !!item?.items?.filter((i) => i.url === href).length ||
     (mainNav &&
       href.split('/')[1] !== '' &&
       href.split('/')[1] === item?.url?.split('/')[1])

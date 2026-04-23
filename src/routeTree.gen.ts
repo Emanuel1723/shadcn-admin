@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ClerkRouteRouteImport } from './routes/clerk/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedMantenimientoRouteImport } from './routes/_authenticated/mantenimiento'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
@@ -74,6 +75,12 @@ const AuthenticatedColaboradoresLazyRoute =
   } as any).lazy(() =>
     import('./routes/_authenticated/colaboradores.lazy').then((d) => d.Route),
   )
+const AuthenticatedMantenimientoRoute =
+  AuthenticatedMantenimientoRouteImport.update({
+    id: '/mantenimiento',
+    path: '/mantenimiento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const errors503Route = errors503RouteImport.update({
   id: '/(errors)/503',
   path: '/503',
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/colaboradores': typeof AuthenticatedColaboradoresLazyRoute
   '/equipos/': typeof EquiposIndexLazyRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
@@ -260,6 +268,7 @@ export interface FileRoutesByTo {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/colaboradores': typeof AuthenticatedColaboradoresLazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/equipos': typeof EquiposIndexLazyRoute
@@ -295,6 +304,7 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
+  '/_authenticated/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/_authenticated/colaboradores': typeof AuthenticatedColaboradoresLazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/equipos/': typeof EquiposIndexLazyRoute
@@ -329,6 +339,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/mantenimiento'
     | '/colaboradores'
     | '/equipos/'
     | '/errors/$error'
@@ -358,6 +369,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/mantenimiento'
     | '/colaboradores'
     | '/'
     | '/equipos'
@@ -392,6 +404,7 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
+    | '/_authenticated/mantenimiento'
     | '/_authenticated/colaboradores'
     | '/_authenticated/'
     | '/equipos/'
@@ -462,6 +475,13 @@ declare module '@tanstack/react-router' {
       path: '/colaboradores'
       fullPath: '/colaboradores'
       preLoaderRoute: typeof AuthenticatedColaboradoresLazyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mantenimiento': {
+      id: '/_authenticated/mantenimiento'
+      path: '/mantenimiento'
+      fullPath: '/mantenimiento'
+      preLoaderRoute: typeof AuthenticatedMantenimientoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(errors)/503': {
@@ -681,6 +701,7 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedMantenimientoRoute: typeof AuthenticatedMantenimientoRoute
   AuthenticatedColaboradoresLazyRoute: typeof AuthenticatedColaboradoresLazyRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
@@ -693,6 +714,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedMantenimientoRoute: AuthenticatedMantenimientoRoute,
   AuthenticatedColaboradoresLazyRoute: AuthenticatedColaboradoresLazyRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
