@@ -21,5 +21,9 @@
     "thClassName:\\s*\"([^\"]*)\"",
     "thClassName:\\s*'([^']*)'"
   ],
-  "tailwindCSS.classFunctions": ["cn", "clsx"]
+  "tailwindCSS.classFunctions": [
+    "cn",
+    "clsx"
+  ],
+  "prisma.pinToPrisma6": true
 }
