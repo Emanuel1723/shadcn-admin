@@ -15,6 +15,7 @@ import { Route as ClerkRouteRouteImport } from './routes/clerk/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedMantenimientoRouteImport } from './routes/_authenticated/mantenimiento'
+import { Route as AuthenticatedInventarioRouteImport } from './routes/_authenticated/inventario'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
@@ -43,7 +44,9 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 
-const EquiposIndexLazyRouteImport = createFileRoute('/equipos/')()
+const AuthenticatedEquiposLazyRouteImport = createFileRoute(
+  '/_authenticated/equipos',
+)()
 const AuthenticatedColaboradoresLazyRouteImport = createFileRoute(
   '/_authenticated/colaboradores',
 )()
@@ -57,16 +60,19 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EquiposIndexLazyRoute = EquiposIndexLazyRouteImport.update({
-  id: '/equipos/',
-  path: '/equipos/',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/equipos/index.lazy').then((d) => d.Route))
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEquiposLazyRoute =
+  AuthenticatedEquiposLazyRouteImport.update({
+    id: '/equipos',
+    path: '/equipos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/equipos.lazy').then((d) => d.Route),
+  )
 const AuthenticatedColaboradoresLazyRoute =
   AuthenticatedColaboradoresLazyRouteImport.update({
     id: '/colaboradores',
@@ -81,6 +87,11 @@ const AuthenticatedMantenimientoRoute =
     path: '/mantenimiento',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInventarioRoute = AuthenticatedInventarioRouteImport.update({
+  id: '/inventario',
+  path: '/inventario',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const errors503Route = errors503RouteImport.update({
   id: '/(errors)/503',
   path: '/503',
@@ -238,9 +249,10 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/inventario': typeof AuthenticatedInventarioRoute
   '/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/colaboradores': typeof AuthenticatedColaboradoresLazyRoute
-  '/equipos/': typeof EquiposIndexLazyRoute
+  '/equipos': typeof AuthenticatedEquiposLazyRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -268,10 +280,11 @@ export interface FileRoutesByTo {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/inventario': typeof AuthenticatedInventarioRoute
   '/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/colaboradores': typeof AuthenticatedColaboradoresLazyRoute
+  '/equipos': typeof AuthenticatedEquiposLazyRoute
   '/': typeof AuthenticatedIndexRoute
-  '/equipos': typeof EquiposIndexLazyRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -304,10 +317,11 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
+  '/_authenticated/inventario': typeof AuthenticatedInventarioRoute
   '/_authenticated/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/_authenticated/colaboradores': typeof AuthenticatedColaboradoresLazyRoute
+  '/_authenticated/equipos': typeof AuthenticatedEquiposLazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/equipos/': typeof EquiposIndexLazyRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -339,9 +353,10 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/inventario'
     | '/mantenimiento'
     | '/colaboradores'
-    | '/equipos/'
+    | '/equipos'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -369,10 +384,11 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/inventario'
     | '/mantenimiento'
     | '/colaboradores'
-    | '/'
     | '/equipos'
+    | '/'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -404,10 +420,11 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
+    | '/_authenticated/inventario'
     | '/_authenticated/mantenimiento'
     | '/_authenticated/colaboradores'
+    | '/_authenticated/equipos'
     | '/_authenticated/'
-    | '/equipos/'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -437,7 +454,6 @@ export interface RootRouteChildren {
   errors404Route: typeof errors404Route
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
-  EquiposIndexLazyRoute: typeof EquiposIndexLazyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -456,18 +472,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/equipos/': {
-      id: '/equipos/'
-      path: '/equipos'
-      fullPath: '/equipos/'
-      preLoaderRoute: typeof EquiposIndexLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/equipos': {
+      id: '/_authenticated/equipos'
+      path: '/equipos'
+      fullPath: '/equipos'
+      preLoaderRoute: typeof AuthenticatedEquiposLazyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/colaboradores': {
@@ -482,6 +498,13 @@ declare module '@tanstack/react-router' {
       path: '/mantenimiento'
       fullPath: '/mantenimiento'
       preLoaderRoute: typeof AuthenticatedMantenimientoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventario': {
+      id: '/_authenticated/inventario'
+      path: '/inventario'
+      fullPath: '/inventario'
+      preLoaderRoute: typeof AuthenticatedInventarioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(errors)/503': {
@@ -701,8 +724,10 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedInventarioRoute: typeof AuthenticatedInventarioRoute
   AuthenticatedMantenimientoRoute: typeof AuthenticatedMantenimientoRoute
   AuthenticatedColaboradoresLazyRoute: typeof AuthenticatedColaboradoresLazyRoute
+  AuthenticatedEquiposLazyRoute: typeof AuthenticatedEquiposLazyRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -714,8 +739,10 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedInventarioRoute: AuthenticatedInventarioRoute,
   AuthenticatedMantenimientoRoute: AuthenticatedMantenimientoRoute,
   AuthenticatedColaboradoresLazyRoute: AuthenticatedColaboradoresLazyRoute,
+  AuthenticatedEquiposLazyRoute: AuthenticatedEquiposLazyRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
@@ -784,7 +811,6 @@ const rootRouteChildren: RootRouteChildren = {
   errors404Route: errors404Route,
   errors500Route: errors500Route,
   errors503Route: errors503Route,
-  EquiposIndexLazyRoute: EquiposIndexLazyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import axios from 'axios'
 import {
   Users,
   Search,
@@ -18,8 +19,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
 import {
   Table,
   TableBody,
@@ -29,8 +28,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Main } from '@/components/layout/main'
-import { topNav } from '@/components/layout/nav-links'
-import { TopNav } from '@/components/layout/top-nav'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 // 1. Interfaz para eliminar errores de "any"
@@ -43,6 +40,7 @@ interface Colaborador {
 
 export function ColaboradoresView() {
   const [open, setOpen] = useState(false)
+  const [, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [editingColaborador, setEditingColaborador] =
     useState<Colaborador | null>(null)
@@ -72,12 +70,31 @@ export function ColaboradoresView() {
     }
   })
 
+  const fetchColaboradores = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get('http://localhost:3000/colaboradores')
+      setColaboradores(response.data)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching colaboradores:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [setColaboradores, setLoading])
+
   useEffect(() => {
-    localStorage.setItem(
-      'aila_inventario_colaboradores',
-      JSON.stringify(colaboradores)
-    )
-  }, [colaboradores])
+    const cargarColaboradores = async () => {
+      setLoading(true)
+      try {
+        await fetchColaboradores()
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    cargarColaboradores()
+  }, [fetchColaboradores])
 
   const colaboradoresFiltrados = useMemo(() => {
     return colaboradores.filter(
@@ -122,28 +139,21 @@ export function ColaboradoresView() {
 
   return (
     <Main className='m-0 flex w-full min-w-0 flex-1 flex-col p-0'>
-      <header className='sticky top-0 z-20 flex h-16 w-full shrink-0 items-center justify-between gap-2 border-b bg-background px-4 md:px-6'>
-        <div className='flex items-center gap-2'>
-          <SidebarTrigger />
-          <Separator orientation='vertical' className='mx-2 h-4' />
-          <div className='flex flex-col'>
-            <h1 className='text-sm font-bold tracking-tight'>
-              Colaboradores - AILA
-            </h1>
-            <span className='text-[10px] font-bold text-blue-500 uppercase'>
-              Gestión de Personal
-            </span>
-          </div>
-          <Separator orientation='vertical' className='mx-2 h-4' />
-          <TopNav links={topNav} className='me-auto' />
+      {/* --- CABECERA DE LA PÁGINA --- */}
+      <div className='flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between'>
+        <div>
+          <h2 className='text-2xl font-bold tracking-tight'>Colaboradores</h2>
+          <p className='text-sm font-medium tracking-wider text-blue-500 uppercase'>
+            Gestión de Personal - AILA
+          </p>
         </div>
 
-        <div className='flex items-center gap-3'>
-          <div className='relative hidden sm:block'>
+        <div className='flex flex-wrap items-center gap-2'>
+          <div className='relative w-full sm:w-64'>
             <Search className='absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground' />
             <Input
               placeholder='Buscar por nombre o depto...'
-              className='h-9 w-48 bg-muted/50 pl-9 md:w-80'
+              className='h-9 pl-9'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -151,17 +161,16 @@ export function ColaboradoresView() {
           <ThemeSwitch />
           <Button
             size='sm'
-            className='gap-2 bg-blue-600 hover:bg-blue-700'
+            className='bg-blue-600 font-bold text-white hover:bg-blue-700'
             onClick={() => {
               setEditingColaborador(null)
               setOpen(true)
             }}
           >
-            <UserPlus size={16} />
-            <span className='hidden md:inline'>Añadir Colaborador</span>
+            <UserPlus size={18} className='mr-1' /> Nuevo
           </Button>
         </div>
-      </header>
+      </div>
 
       <div className='w-full min-w-0 flex-1 px-10 pt-10'>
         <div className='w-full overflow-hidden rounded-xl border border-border bg-card shadow-sm'>

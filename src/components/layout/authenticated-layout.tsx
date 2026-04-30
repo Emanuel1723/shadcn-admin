@@ -3,7 +3,12 @@ import { getCookie } from '@/lib/cookies'
 import { cn } from '@/lib/utils'
 import { LayoutProvider } from '@/context/layout-provider'
 import { SearchProvider } from '@/context/search-provider'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SkipToMain } from '@/components/skip-to-main'
 
@@ -17,26 +22,31 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <SearchProvider>
       <LayoutProvider>
-        {/* IMPORTANTE: SidebarProvider ya es un contenedor flex. 
-           No le agregues 'w-full' manualmente si usas la variante 'inset'.
-        */}
         <SidebarProvider defaultOpen={defaultOpen}>
           <SkipToMain />
-          
           <AppSidebar />
-          
           <SidebarInset
             className={cn(
-              // flex-1 permite que el contenido ocupe todo el espacio restante.
-              // min-w-0 es VITAL para que las tablas con scroll no rompan el layout.
-              'relative flex min-h-svh flex-1 flex-col bg-background min-w-0',
+              'relative flex min-h-svh min-w-0 flex-1 flex-col bg-background',
               '@container/content'
             )}
           >
-            {/* Renderiza la página. Asegúrate de que en 'ColaboradoresPage' 
-                NO estés llamando a AuthenticatedLayout otra vez.
-            */}
-            {children ?? <Outlet />}
+            {/* --- HEADER GLOBAL (Aquí vive el botón ahora) --- */}
+            <header className='flex h-16 shrink-0 items-center gap-2 border-b px-4'>
+              <SidebarTrigger className='-ml-1' />
+              <Separator orientation='vertical' className='mr-2 h-4' />
+              <div className='flex flex-col'>
+                <h1 className='text-sm font-bold tracking-tight'>SICA-AILA</h1>
+                <span className='text-[10px] font-bold tracking-widest text-blue-500 uppercase'>
+                  Sistema de Inventario
+                </span>
+              </div>
+            </header>
+
+            {/* --- CONTENIDO DE LAS PÁGINAS --- */}
+            <div className='flex flex-1 flex-col overflow-hidden'>
+              {children ?? <Outlet />}
+            </div>
           </SidebarInset>
         </SidebarProvider>
       </LayoutProvider>

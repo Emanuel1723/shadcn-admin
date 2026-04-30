@@ -1,10 +1,11 @@
 import {
   LayoutDashboard,
-  Laptop, 
+  Laptop,
   Users,
   Wrench,
   Settings,
   Command,
+  Package,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -39,6 +40,11 @@ export const sidebarData: SidebarData = {
           title: 'Colaboradores',
           url: '/colaboradores',
           icon: Users,
+        },
+        {
+          title: 'Inventario IT',
+          url: '/inventario',
+          icon: Package,
         },
       ],
     },

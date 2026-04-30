@@ -1,6 +1,14 @@
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Sheet,
   SheetClose,
@@ -11,15 +19,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus } from 'lucide-react'
 
 export function MaintenanceAddSheet() {
   return (
@@ -36,7 +36,7 @@ export function MaintenanceAddSheet() {
             Registra un nuevo servicio técnico para los equipos del aeropuerto.
           </SheetDescription>
         </SheetHeader>
-        
+
         <div className='grid gap-4 py-4'>
           {/* Selección de Equipo */}
           <div className='grid gap-2'>
@@ -49,11 +49,11 @@ export function MaintenanceAddSheet() {
             <Label htmlFor='tipo'>Tipo de Servicio</Label>
             <Select>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar tipo" />
+                <SelectValue placeholder='Seleccionar tipo' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="preventivo">Preventivo</SelectItem>
-                <SelectItem value="correctivo">Correctivo</SelectItem>
+                <SelectItem value='preventivo'>Preventivo</SelectItem>
+                <SelectItem value='correctivo'>Correctivo</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -73,9 +73,9 @@ export function MaintenanceAddSheet() {
           {/* Observaciones */}
           <div className='grid gap-2'>
             <Label htmlFor='obs'>Observaciones Iniciales</Label>
-            <Textarea 
-              id='obs' 
-              placeholder='Describe el estado del equipo o la falla...' 
+            <Textarea
+              id='obs'
+              placeholder='Describe el estado del equipo o la falla...'
               className='resize-none'
             />
           </div>
@@ -83,9 +83,13 @@ export function MaintenanceAddSheet() {
 
         <SheetFooter className='mt-6'>
           <SheetClose asChild>
-            <Button variant='outline' className='w-full sm:w-auto'>Cancelar</Button>
+            <Button variant='outline' className='w-full sm:w-auto'>
+              Cancelar
+            </Button>
           </SheetClose>
-          <Button type='submit' className='w-full sm:w-auto'>Guardar Registro</Button>
+          <Button type='submit' className='w-full sm:w-auto'>
+            Guardar Registro
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

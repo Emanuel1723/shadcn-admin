@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MaintenanceAddSheet } from '@/routes/MaintenanceAddSheet'
+import { MaintenanceAddSheet } from '@/routes/_authenticated/-components/-MaintenanceAddSheet'
 import { Search, Pencil, Trash2, Calendar, User, Monitor } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
