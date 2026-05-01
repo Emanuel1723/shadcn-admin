@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import axios from 'axios'
 import {
   Users,
@@ -39,62 +39,24 @@ interface Colaborador {
 }
 
 export function ColaboradoresView() {
-  const [open, setOpen] = useState(false)
-  const [, setLoading] = useState(true)
+  const [colaboradores, setColaboradores] = useState<Colaborador[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [open, setOpen] = useState(false)
   const [editingColaborador, setEditingColaborador] =
     useState<Colaborador | null>(null)
 
-  const [colaboradores, setColaboradores] = useState<Colaborador[]>(() => {
-    try {
-      const saved = localStorage.getItem('aila_inventario_colaboradores')
-      return saved
-        ? JSON.parse(saved)
-        : [
-            {
-              id: '1',
-              nombre: 'Emanuel González',
-              cargo: 'Soporte Técnico',
-              depto: 'TI',
-            },
-            {
-              id: '2',
-              nombre: 'Ovimer',
-              cargo: 'Soporte Técnico',
-              depto: 'TI',
-            },
-          ]
-    } catch (_e) {
-      // Usamos _e para que ESLint no se queje de variable no usada
-      return []
-    }
-  })
-
-  const fetchColaboradores = useCallback(async () => {
-    setLoading(true)
-    try {
-      const response = await axios.get('http://localhost:3000/colaboradores')
-      setColaboradores(response.data)
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error fetching colaboradores:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [setColaboradores, setLoading])
-
   useEffect(() => {
-    const cargarColaboradores = async () => {
-      setLoading(true)
+    const fetchData = async () => {
       try {
-        await fetchColaboradores()
-      } finally {
-        setLoading(false)
+        const response = await axios.get('http://localhost:3000/colaboradores')
+        setColaboradores(response.data)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error al cargar colaboradores:', error)
       }
     }
-
-    cargarColaboradores()
-  }, [fetchColaboradores])
+    fetchData()
+  }, [])
 
   const colaboradoresFiltrados = useMemo(() => {
     return colaboradores.filter(

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import { DialogDescription } from '@radix-ui/react-dialog'
@@ -26,6 +27,73 @@ import {
 } from '@/components/ui/table'
 import { Main } from '@/components/layout/main'
 import { ThemeSwitch } from '@/components/theme-switch'
+
+interface ModalProps {
+  equipo: Equipo
+  colaboradores: any[]
+  onClose: () => void
+  onUpdate: () => void
+}
+export function ModalAsignacion({
+  equipo,
+  colaboradores,
+  onClose,
+  onUpdate,
+}: ModalProps) {
+  const [colaboradorId, setColaboradorId] = useState('')
+
+  const handleAsignar = async () => {
+    try {
+      await axios.patch(`http://localhost:3000/equipos/asignar/${equipo.id}`, {
+        colaboradorId: parseInt(colaboradorId),
+      })
+      setColaboradorId('')
+      alert('Equipo asignado correctamente')
+      onUpdate()
+      onClose()
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error al asignar el equipo:', error)
+      alert('Hubo un error al asignar el equipo.')
+    }
+  }
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+      <div className='w-96 rounded-lg bg-white p-6 text-black shadow-xl'>
+        <h3 className='mb-2 text-lg font-bold'>Asignar Equipo</h3>
+        <p className='mb-4 text-sm'>
+          Modelo: {equipo.modelo} ({equipo.serial})
+        </p>
+
+        <select
+          className='mb-4 w-full rounded border p-2'
+          value={colaboradorId}
+          onChange={(e) => setColaboradorId(e.target.value)}
+        >
+          <option value=''>Seleccionar técnico...</option>
+          {colaboradores.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nombre}
+            </option>
+          ))}
+        </select>
+
+        <div className='flex justify-end gap-2'>
+          <button onClick={onClose} className='rounded bg-gray-200 px-4 py-2'>
+            Cancelar
+          </button>
+          <button
+            onClick={handleAsignar}
+            disabled={!colaboradorId}
+            className='rounded bg-blue-600 px-4 py-2 text-white disabled:bg-blue-300'
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function InventarioPage() {
   const [equipos, setEquipos] = useState<Equipo[]>([])
@@ -296,7 +364,10 @@ export function InventarioPage() {
                     placeholder='Dell, HP, Lenovo...'
                     value={nuevoEquipo.marca}
                     onChange={(e) =>
-                      setNuevoEquipo({ ...nuevoEquipo, marca: e.target.value })
+                      setNuevoEquipo({
+                        ...nuevoEquipo,
+                        marca: e.target.value,
+                      })
                     }
                   />
                 </div>
@@ -311,7 +382,10 @@ export function InventarioPage() {
                     placeholder='Ej: Latitude 5420'
                     value={nuevoEquipo.modelo}
                     onChange={(e) =>
-                      setNuevoEquipo({ ...nuevoEquipo, modelo: e.target.value })
+                      setNuevoEquipo({
+                        ...nuevoEquipo,
+                        modelo: e.target.value,
+                      })
                     }
                   />
                 </div>
@@ -326,7 +400,10 @@ export function InventarioPage() {
                     placeholder='Service Tag o Serial Number'
                     value={nuevoEquipo.serial}
                     onChange={(e) =>
-                      setNuevoEquipo({ ...nuevoEquipo, serial: e.target.value })
+                      setNuevoEquipo({
+                        ...nuevoEquipo,
+                        serial: e.target.value,
+                      })
                     }
                   />
                 </div>
